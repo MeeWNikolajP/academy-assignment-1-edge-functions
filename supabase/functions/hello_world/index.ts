@@ -3,17 +3,30 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+// import { corsHeaders } from "../_shared/cors.ts";
 
 console.log("Hello from Functions!");
 
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "apikey, X-Client-Info, Content-Type, Authorization, Accept, Accept-Language, X-Authorization",
+  "Access-Control-Allow-Methods": "POST",
+  "Access-Control-Expose-Headers": "Content-Length, X-JSON",
+};
+
 serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
+  }
+
   const { name } = await req.json();
   const data = {
     message: `Hello ${name}!`,
   };
 
   return new Response(JSON.stringify(data), {
-    headers: { "Content-Type": "application/json" },
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 });
 
